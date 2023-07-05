@@ -2,3 +2,73 @@
 main driver file.
 Responsible for handling user input and displaying current gamestate
 """
+
+import pygame as p
+import numpy as np
+import ChessEngine
+
+p.init()
+WIDTH = HEIGHT = 512  # size of our board
+DIMENSION = 8  # Dimension of our chess board is 8x8
+SQ_SIZE = WIDTH // DIMENSION  # size of each square
+MAX_FPS = 15
+
+# initialize global directory of images .This will be called exactly once in the main
+IMAGES = {}
+
+
+def loadImages():
+    pieces = ['wp', 'wR', 'wN', 'wB', 'wK', 'wQ', 'bp', 'bR', 'bN', 'bB', 'bK', 'bQ']
+    for piece in pieces:
+        IMAGES[piece] = p.transform.scale(p.image.load('images/' + piece + '.png'), (SQ_SIZE, SQ_SIZE))
+        # images can be accessed by IMAGES['wK']
+
+
+# main driver function , handles inputs and graphics update
+
+def main():
+    screen = p.display.set_mode((WIDTH, HEIGHT))  # set up the screen
+    p.display.set_caption("Chess")
+    clock = p.time.Clock()
+    screen.fill(p.Color("white"))
+    gs = ChessEngine.GameState()
+
+    loadImages()
+
+    running = True
+    while running:
+        for e in p.event.get():
+            if e.type == p.QUIT:
+                running = False
+                break
+        drawGameState(screen, gs)
+        clock.tick(MAX_FPS)
+        p.display.flip()
+
+
+# responsible for all  graphics with current game state
+def drawGameState(screen, gs):
+    drawBoard(screen)  # draw pieces on the screen
+    drawPieces(screen, gs.board)
+
+
+# Draw the board, top left cell is always white
+def drawBoard(screen):
+    colors = [p.Color("white"), p.Color("grey")]
+    for r in range(DIMENSION):
+        for c in range(DIMENSION):
+            color = colors[(r + c) % 2]
+            p.draw.rect(screen, color, p.Rect(c * SQ_SIZE, r * SQ_SIZE, SQ_SIZE, SQ_SIZE))
+
+
+# draw the pieces using current gamestate
+def drawPieces(screen, board):
+    for r in range(DIMENSION):
+        for c in range(DIMENSION):
+            piece = board[r, c]
+            if piece != '--':  # space is not empty
+                screen.blit(IMAGES[piece], p.Rect(c * SQ_SIZE, r * SQ_SIZE, SQ_SIZE, SQ_SIZE))
+
+
+if __name__ == "__main__":
+    main()
