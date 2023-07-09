@@ -26,92 +26,7 @@ def loadImages():
 
 # main driver function , handles inputs and graphics update
 
-def main():
-    screen = p.display.set_mode((WIDTH, HEIGHT))  # set up the screen
-    p.display.set_caption("Chess")
-    clock = p.time.Clock()
-    screen.fill(p.Color("white"))
-    gs = ChessEngine.GameState()
-    loadImages()
 
-    dragging = False  # Flag to track if a piece is being dragged
-    selected_piece = '--'  # Stores the selected piece being dragged
-    sqSelected = ()  # Stores the initial position of the selected piece
-    playerClicks = []  # Keeps track of player clicks (2 Tuples: ex, (6, 4) -> (4, 4))
-
-    running = True
-    while running:
-        for e in p.event.get():
-            if e.type == p.QUIT:
-                running = False
-            elif e.type == p.MOUSEBUTTONDOWN:
-                if not dragging:
-                    location = p.mouse.get_pos()  # x, y coordinate of mouse click
-                    col = location[0] // SQ_SIZE
-                    row = location[1] // SQ_SIZE
-                    if gs.board[row, col] != '--':
-                        sqSelected = (row, col)
-                        playerClicks.append(sqSelected)
-                        selected_piece = gs.board[row, col]
-
-                    dragging = True
-                    drawGameState(screen, gs)
-
-            elif e.type == p.MOUSEBUTTONUP:
-                if dragging:
-                    location = p.mouse.get_pos()  # x, y coordinate of mouse release
-                    col = location[0] // SQ_SIZE
-                    row = location[1] // SQ_SIZE
-                    if sqSelected == (row, col):  # user clicked on same square twice, i.e. it needed to be unselected
-                        sqSelected = ()
-                        playerClicks = []
-                    else:
-                        sqSelected = (row, col)
-                        playerClicks.append(sqSelected)
-                        move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
-                        print(move.getChessNotation())
-                        gs.makeMove(move)
-                        sqSelected = ()
-                        playerClicks = []
-                    dragging = False
-
-            drawGameState(screen, gs)
-
-            if dragging and selected_piece != '--':
-                # Draw the piece being dragged at the current mouse position
-                mouse_pos = p.mouse.get_pos()
-                drawGameState(screen, gs, sqSelected)
-                screen.blit(IMAGES[selected_piece],
-                            p.Rect(mouse_pos[0] - SQ_SIZE / 2, mouse_pos[1] - SQ_SIZE / 2, SQ_SIZE, SQ_SIZE))
-
-        clock.tick(MAX_FPS)
-        p.display.flip()
-
-
-# responsible for all graphics with current game state
-def drawGameState(screen, gs, sqSelected=None):
-    drawBoard(screen)  # draw the board
-    drawPieces(screen, gs.board, sqSelected)
-
-
-# draw the pieces using the current game state
-def drawPieces(screen, board, sqSelected=None):
-    for r in range(DIMENSION):
-        for c in range(DIMENSION):
-            piece = board[r, c]
-            if piece != '--' and (r, c) != sqSelected:  # space is not empty and not the selected square
-                screen.blit(IMAGES[piece], p.Rect(c * SQ_SIZE, r * SQ_SIZE, SQ_SIZE, SQ_SIZE))
-
-
-def drawBoard(screen):
-    colors = [p.Color("white"), p.Color("grey")]
-    for r in range(DIMENSION):
-        for c in range(DIMENSION):
-            color = colors[(r + c) % 2]
-            p.draw.rect(screen, color, p.Rect(c * SQ_SIZE, r * SQ_SIZE, SQ_SIZE, SQ_SIZE))
-
-
-"""
 def main():
     screen = p.display.set_mode((WIDTH, HEIGHT))  # set up the screen
     p.display.set_caption("Chess")
@@ -136,10 +51,10 @@ def main():
                 row = location[1] // SQ_SIZE
                 # determining which square user clicked
 
-                if sqSelected == (row, col):  # user clicked on same square twice, ie. it needed to be unselected
+                if sqSelected == (row, col):  # user clicked on same square twice, i.e. it needed to be unselected
                     sqSelected = ()
                     playerClicks = []
-                else:
+                elif gs.board[row, col] != '--' or len(playerClicks) == 1:
                     sqSelected = (row, col)
                     playerClicks.append(sqSelected)
                 if len(playerClicks) == 2:
@@ -152,8 +67,6 @@ def main():
         drawGameState(screen, gs)
         clock.tick(MAX_FPS)
         p.display.flip()
-
-
 
 
 # responsible for all  graphics with current game state
@@ -179,6 +92,6 @@ def drawPieces(screen, board):
             if piece != '--':  # space is not empty
                 screen.blit(IMAGES[piece], p.Rect(c * SQ_SIZE, r * SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
-"""
+
 if __name__ == "__main__":
     main()
