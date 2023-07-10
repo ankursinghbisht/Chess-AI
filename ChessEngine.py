@@ -70,7 +70,17 @@ class GameState:
     def getPawnMoves(self, r, c, moves):
         # gets all possible pawn moves and append it to moves
 
-        pass
+        if self.whiteToMove:  # white's turn
+            if self.board[r - 1, c] == '--':  # 1 square pawn advance
+                moves.append(Move((r, c), (r - 1, c), self.board))
+                if r == 6 and self.board[r - 2, c] == "--":  # 2 square pawn advance
+                    moves.append(Move((r, c), (r - 2, c), self.board))
+            if c - 1 >= 0:  # captures to the left , to check if piece don't go overboard
+                if self.board[r - 1, c - 1][0] == 'b':  # enemy's piece to capture
+                    moves.append(Move((r, c), (r - 1, c - 1), self.board))
+            if c + 1 <= 7:  # captures to the right , to check if piece don't go overboard
+                if self.board[r - 1, c + 1][0] == 'b':  # enemy's piece to capture
+                    moves.append(Move((r, c), (r - 1, c + 1), self.board))
 
     def getRookMoves(self, r, c, moves):
         # gets all possible rook moves and append to moves variable
