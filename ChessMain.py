@@ -23,10 +23,9 @@ def loadImages():
         # images can be accessed by IMAGES['wK']
 
 
-# main driver function , handles inputs and graphics update
-
-
 def main():
+    # main driver function , handles inputs and graphics update
+
     screen = p.display.set_mode((WIDTH, HEIGHT))  # set up the screen
     p.display.set_caption("Chess")
     clock = p.time.Clock()
@@ -41,7 +40,7 @@ def main():
     running = True
     while running:
         for e in p.event.get():
-            if e.type == p.QUIT:
+            if e.type == p.QUIT:  # exits the game
                 running = False
                 break
             elif e.type == p.MOUSEBUTTONDOWN:
@@ -50,43 +49,52 @@ def main():
                 row = location[1] // SQ_SIZE
                 # determining which square user clicked
 
-                if sqSelected == (row, col):  # user clicked on same square twice, i.e. it needed to be unselected
+                if sqSelected == (row, col):
+                    # user clicked on same square twice, i.e. it needed to be unselected
                     sqSelected = ()
                     playerClicks = []
+
                 elif gs.board[row, col] != '--' or len(playerClicks) == 1:
+                    # not allowing user to selected empty square
                     sqSelected = (row, col)
                     playerClicks.append(sqSelected)
                 if len(playerClicks) == 2:
+                    # once 2 clicks are made to move the piece, move the piece
                     move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
-                    print(move.getChessNotation())
+                    print(move.getChessNotation())  # print notation
                     gs.makeMove(move)
                     sqSelected = ()
-                    playerClicks = []
+                    playerClicks = []  # empty both variables for next use
             elif e.type == p.KEYDOWN:
                 if e.key == p.K_z:
+                    # if key entered is "z", undo moves
                     gs.undo()
-        drawGameState(screen, gs)
+        drawGameState(screen, gs)  # draw the board
         clock.tick(MAX_FPS)
         p.display.flip()
 
 
-# responsible for all  graphics with current game state
 def drawGameState(screen, gs):
+    # responsible for all  graphics with current game state
+
     drawBoard(screen)  # draw pieces on the screen
     drawPieces(screen, gs.board)
 
 
-# Draw the board, top left cell is always white
 def drawBoard(screen):
+    # Draw the board, top left cell is always white
+
     colors = [p.Color("white"), p.Color("grey")]
     for r in range(DIMENSION):
         for c in range(DIMENSION):
             color = colors[(r + c) % 2]
+            # every other cell has same color, i.e. sum of row and column will be even/ odd for each color
             p.draw.rect(screen, color, p.Rect(c * SQ_SIZE, r * SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
 
-# draw the pieces using current gamestate
 def drawPieces(screen, board):
+    # draw the pieces using current gamestate
+
     for r in range(DIMENSION):
         for c in range(DIMENSION):
             piece = board[r, c]
