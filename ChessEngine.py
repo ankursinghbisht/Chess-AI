@@ -28,6 +28,10 @@ class GameState:
         self.board[6] = ['wp'] * 8  # White pawns
         self.board[7] = ['wR', 'wN', 'wB', 'wQ', 'wK', 'wB', 'wN', 'wR']  # White back row
 
+        self.moveFunctions = {'p': self.getPawnMoves, 'R': self.getRookMoves, 'N': self.getKnightMoves,
+                              'B': self.getBishopMoves, 'Q': self.getQueenMoves, 'K': self.getKingMoves}
+        # maps each function to its respective piece character
+
         self.whiteToMove = True
         self.moveLog = []
 
@@ -61,10 +65,7 @@ class GameState:
                 if (turn == 'w' and self.whiteToMove) or (turn == 'b' and not self.whiteToMove):
                     # checks if white player chose the white piece and similar for black.
                     piece = self.board[r, c][1]
-                    if piece == 'p':
-                        self.getPawnMoves(r, c, moves)
-                    elif piece == 'R':
-                        self.getRookMoves(r, c, moves)
+                    self.moveFunctions[piece](r, c, moves)  # calls the appropriate move function based on piece type
         return moves
 
     def getPawnMoves(self, r, c, moves):
@@ -97,6 +98,26 @@ class GameState:
 
     def getRookMoves(self, r, c, moves):
         # gets all possible rook moves and append to moves variable
+
+        pass
+
+    def getBishopMoves(self, r, c, moves):
+        # gets all possible bishop moves and append to moves variable
+
+        pass
+
+    def getKnightMoves(self, r, c, moves):
+        # gets all possible knight moves and append to moves variable
+
+        pass
+
+    def getQueenMoves(self, r, c, moves):
+        # gets all possible queen moves and append to moves variable
+
+        pass
+
+    def getKingMoves(self, r, c, moves):
+        # gets all possible king moves and append to moves variable
 
         pass
 
