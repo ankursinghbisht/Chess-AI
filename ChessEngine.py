@@ -29,12 +29,20 @@ class GameState:
         self.whiteToMove = True
         self.moveLog = []
 
+    #Takes move as parameter & executes it, doesn't include Castling & en-passant
     def makeMove(self, move):
         self.board[move.startRow, move.startCol] = '--'
         self.board[move.endRow, move.endCol] = move.pieceMoved
         self.moveLog.append(move)  # log the move to be able to undo it later
         self.whiteToMove = not self.whiteToMove  # swapping the player turn
 
+    #undo last move
+    def undo(self):
+        if len(self.moveLog):
+            move = self.moveLog.pop()
+            self.board[move.startRow,move.startCol]=move.pieceMoved
+            self.board[move.endRow,move.endCol]=move.pieceCaptured
+            self.whiteToMove= not self.whiteToMove
 
 class Move:
     # mapping key value pairs for rows in board to their respective ranks

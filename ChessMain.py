@@ -4,7 +4,6 @@ Responsible for handling user input and displaying current gamestate
 """
 
 import pygame as p
-import numpy as np
 import ChessEngine
 
 p.init()
@@ -63,7 +62,9 @@ def main():
                     gs.makeMove(move)
                     sqSelected = ()
                     playerClicks = []
-
+            elif e.type == p.KEYDOWN:
+                if e.key == p.K_z:
+                    gs.undo()
         drawGameState(screen, gs)
         clock.tick(MAX_FPS)
         p.display.flip()
