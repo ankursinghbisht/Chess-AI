@@ -7,6 +7,8 @@ Responsible for :
 
 import numpy as np
 
+DIMENSION = 8
+
 
 class GameState:
     def __init__(self):
@@ -46,6 +48,35 @@ class GameState:
             self.board[move.endRow, move.endCol] = move.pieceCaptured
             self.whiteToMove = not self.whiteToMove  # switches the turn
 
+    def getValidMoves(self):
+        # all moves considering checks, i.e.to check if the piece movement gets king a check.
+        pass
+
+    def getAllPossibleMoves(self):
+        # Get piece's all possible moves
+        moves = [Move([6, 4], [4, 4], self.board)]  # stores all possible moves
+        for r in range(DIMENSION):
+            for c in range(DIMENSION):
+                turn = self.board[r, c][0]  # gets first character of the pieces ( eg, bR -> b, wK -> w)
+                if (turn == 'w' and self.whiteToMove) or (turn == 'b' and not self.whiteToMove):
+                    # checks if white player chose the white piece and similar for black.
+                    piece = self.board[r, c][1]
+                    if piece == 'p':
+                        self.getPawnMoves(r, c, moves)
+                    elif piece == 'R':
+                        self.getRookMoves(r, c, moves)
+        return moves
+
+    def getPawnMoves(self, r, c, moves):
+        # gets all possible pawn moves and append it to moves
+
+        pass
+
+    def getRookMoves(self, r, c, moves):
+        # gets all possible rook moves and append to moves variable
+
+        pass
+
 
 class Move:
     # mapping ranks to their respective rows
@@ -65,9 +96,18 @@ class Move:
         self.endRow = endSq[0]
         self.endCol = endSq[1]
 
+        self.moveID = self.startRow * 1000 + self.startCol * 100 + self.endRow * 10 + self.endCol
+        # unique move-id for each move
+
         # storing piece moved and piece captured(if any), for undoing if needed
         self.pieceMoved = board[self.startRow, self.startCol]
         self.pieceCaptured = board[self.endRow, self.endCol]
+
+    def __eq__(self, other):
+        # defining comparison operator for moves comparison
+        if isinstance(other, Move):
+            return self.moveID == other.moveID
+        return False
 
     def getChessNotation(self):
         # returns chess notation for particular move

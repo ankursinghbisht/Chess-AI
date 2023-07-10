@@ -30,10 +30,12 @@ def main():
     p.display.set_caption("Chess")
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
+
     gs = ChessEngine.GameState()
+    validMoves = gs.getAllPossibleMoves()  # gets valid move for current state
+    moveMade = False  # flag variable to check if move is made for update of valid moves
 
     loadImages()
-
     sqSelected = ()  # stores  last click of user as tuple (x,y)
     playerClicks = []  # keeps track of player clicks ( 2 Tuples : ex, (6,4)->(4,4))
 
@@ -61,14 +63,22 @@ def main():
                 if len(playerClicks) == 2:
                     # once 2 clicks are made to move the piece, move the piece
                     move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
-                    print(move.getChessNotation())  # print notation
-                    gs.makeMove(move)
+
+                    if move in validMoves:  # if move is valid, make a move
+                        print(move.getChessNotation())  # print notation
+                        gs.makeMove(move)
+                        moveMade = True
                     sqSelected = ()
                     playerClicks = []  # empty both variables for next use
             elif e.type == p.KEYDOWN:
                 if e.key == p.K_z:
                     # if key entered is "z", undo moves
                     gs.undo()
+                    moveMade = True
+        if moveMade:
+            validMoves = gs.getAllPossibleMoves()
+            moveMade = False
+
         drawGameState(screen, gs)  # draw the board
         clock.tick(MAX_FPS)
         p.display.flip()
