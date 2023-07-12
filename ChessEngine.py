@@ -153,7 +153,20 @@ class GameState:
     def getKnightMoves(self, r, c, moves):
         # gets all possible knight moves and append to moves variable
 
-        pass
+        knightMoves = ((-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1),
+                       (2, 1))  # possible directions of knight move (L-shaped)
+
+        allyColor = 'w' if self.whiteToMove else 'b'  # sets ally color for 1 less if statement
+
+        for k in knightMoves:
+            # sets total cells knight can travel
+            endRow = r + k[0]
+            endCol = c + k[1]
+            if 0 <= endCol < 8 and 0 <= endRow < 8:  # to confirm piece don't move out of board
+                endPiece = self.board[endRow, endCol]  # find piece at the possible location of knight
+                if endPiece[0] != allyColor:
+                    # if piece is of an ally, don't append , as knight can jump over pieces
+                    moves.append(Move((r, c), (endRow, endCol), self.board))
 
     def getQueenMoves(self, r, c, moves):
         # gets all possible queen moves and append to moves variable
