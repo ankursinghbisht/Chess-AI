@@ -68,8 +68,10 @@ def main():
                         print(move.getChessNotation())  # print notation
                         gs.makeMove(move)
                         moveMade = True
-                    sqSelected = ()
-                    playerClicks = []  # empty both variables for next use
+                        sqSelected = ()
+                        playerClicks = []  # empty both variables for next use
+                    else:
+                        playerClicks=[sqSelected]
             elif e.type == p.KEYDOWN:
                 if e.key == p.K_z:
                     # if key entered is "z", undo moves
