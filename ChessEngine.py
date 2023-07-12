@@ -170,8 +170,9 @@ class GameState:
 
     def getQueenMoves(self, r, c, moves):
         # gets all possible queen moves and append to moves variable
-
-        pass
+        self.getRookMoves(r, c, moves)
+        self.getBishopMoves(r, c, moves)
+        # as queen movement is combination of bishop and rook
 
     def getKingMoves(self, r, c, moves):
         # gets all possible king moves and append to moves variable
