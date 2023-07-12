@@ -125,7 +125,30 @@ class GameState:
 
     def getBishopMoves(self, r, c, moves):
         # gets all possible bishop moves and append to moves variable
-        pass
+        directions = ((-1, -1), (1, -1), (1, 1), (-1, 1))  # possible directions of bishop move (all diagonals)
+
+        enemyColor = 'b' if self.whiteToMove else 'w'  # sets enemy color regarding which player has the turn
+
+        for d in directions:
+            for i in range(1, 8):
+                # sets total distance bishop can travel, one step at a time
+                endRow = r + d[0] * i
+                endCol = c + d[1] * i
+                if 0 <= endCol < 8 and 0 <= endRow < 8:  # to confirm piece don't move out of board
+                    endPiece = self.board[endRow, endCol]  # find piece at the possible location of bishop
+                    if endPiece == '--':
+                        # if space is empty
+                        moves.append(Move((r, c), (endRow, endCol), self.board))
+                    elif endPiece[0] == enemyColor:
+                        # if piece is of enemy,append it and close the loop as bishop can't jump over pieces
+                        moves.append(Move((r, c), (endRow, endCol), self.board))
+                        break
+                    else:
+                        # friendly piece is at location, skip further search
+                        break
+                else:
+                    # piece is off board
+                    break
 
     def getKnightMoves(self, r, c, moves):
         # gets all possible knight moves and append to moves variable
