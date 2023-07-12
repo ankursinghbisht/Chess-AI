@@ -176,8 +176,17 @@ class GameState:
 
     def getKingMoves(self, r, c, moves):
         # gets all possible king moves and append to moves variable
-
-        pass
+        kingMoves = (
+        (-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1))  # all possible king movement directions
+        allyColor = 'w' if self.whiteToMove else 'b'  # sets ally color
+        for i in range(8):  # total king movement possibilities
+            endRow = r + kingMoves[i][0]
+            endCol = c + kingMoves[i][1]
+            if 0 <= endRow < 8 and 0 <= endCol < 8:  # piece is on the board , even after moving
+                endPiece = self.board[endRow, endCol]  # fetching the piece on potential king move
+                if endPiece[0] != allyColor:
+                    # piece isn't an ally ( i.e space is empty or an enemy piece )
+                    moves.append(Move((r, c), (endRow, endCol), self.board))
 
 
 class Move:
