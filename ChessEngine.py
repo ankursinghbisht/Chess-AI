@@ -39,6 +39,10 @@ class GameState:
         self.whiteKingLocation = (7, 4)
         self.blackKingLocation = (0, 4)
 
+        # checks for checkmate or stalemate
+        self.checkMate = False
+        self.staleMate = False
+
     def makeMove(self, move):
         # Takes move as parameter & executes it, doesn't include Castling & en-passant
 
@@ -92,6 +96,17 @@ class GameState:
                 moves.remove(moves[i])
             self.whiteToMove = not self.whiteToMove
             self.undoMove()
+
+        if len(moves) == 0:
+            # if there is no valid moves, there might be a checkmate or stalemate
+            if self.inCheck():
+                self.checkMate = True
+            else:
+                self.staleMate = True
+        else:
+            self.checkMate = False
+            self.staleMate = False
+
         return moves
 
     def inCheck(self):
