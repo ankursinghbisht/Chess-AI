@@ -35,6 +35,10 @@ class GameState:
         self.whiteToMove = True
         self.moveLog = []
 
+        # variable to store king's location
+        self.whiteKingLocation = (7, 4)
+        self.blackKingLocation = (0, 4)
+
     def makeMove(self, move):
         # Takes move as parameter & executes it, doesn't include Castling & en-passant
 
@@ -42,6 +46,13 @@ class GameState:
         self.board[move.endRow, move.endCol] = move.pieceMoved
         self.moveLog.append(move)  # log the move to be able to undo it later
         self.whiteToMove = not self.whiteToMove  # swapping the player turn
+
+        if move.pieceMoved == 'wK':
+            # piece moved was white king
+            self.whiteKingLocation = (move.endRow, move.endCol)
+        elif move.pieceMoved == 'bK':
+            # piece moved was white king
+            self.blackKingLocation = (move.endRow, move.endCol)
 
     def undo(self):
         # undo last move
@@ -52,9 +63,16 @@ class GameState:
             self.board[move.endRow, move.endCol] = move.pieceCaptured
             self.whiteToMove = not self.whiteToMove  # switches the turn
 
+            if move.pieceMoved == 'wK':
+                # piece moved was white king
+                self.whiteKingLocation = (move.startRow, move.startCol)
+            elif move.pieceMoved == 'bK':
+                # piece moved was white king
+                self.blackKingLocation = (move.startRow, move.startCol)
+
     def getValidMoves(self):
         # all moves considering checks, i.e.to check if the piece movement gets king a check.
-        pass
+        return self.getAllPossibleMoves()
 
     def getAllPossibleMoves(self):
         # Get piece's all possible moves
@@ -176,8 +194,10 @@ class GameState:
 
     def getKingMoves(self, r, c, moves):
         # gets all possible king moves and append to moves variable
-        kingMoves = (
-        (-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1))  # all possible king movement directions
+
+        kingMoves = ((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1))
+        # all possible king movement directions
+
         allyColor = 'w' if self.whiteToMove else 'b'  # sets ally color
         for i in range(8):  # total king movement possibilities
             endRow = r + kingMoves[i][0]
@@ -185,7 +205,7 @@ class GameState:
             if 0 <= endRow < 8 and 0 <= endCol < 8:  # piece is on the board , even after moving
                 endPiece = self.board[endRow, endCol]  # fetching the piece on potential king move
                 if endPiece[0] != allyColor:
-                    # piece isn't an ally ( i.e space is empty or an enemy piece )
+                    # piece isn't an ally ( i.e. space is empty or an enemy piece )
                     moves.append(Move((r, c), (endRow, endCol), self.board))
 
 

@@ -32,7 +32,7 @@ def main():
     screen.fill(p.Color("white"))
 
     gs = ChessEngine.GameState()
-    validMoves = gs.getAllPossibleMoves()  # gets valid move for current state
+    validMoves = gs.getValidMoves()  # gets valid move for current state
     moveMade = False  # flag variable to check if move is made for update of valid moves
 
     loadImages()
@@ -71,14 +71,14 @@ def main():
                         sqSelected = ()
                         playerClicks = []  # empty both variables for next use
                     else:
-                        playerClicks=[sqSelected]
+                        playerClicks = [sqSelected]
             elif e.type == p.KEYDOWN:
                 if e.key == p.K_z:
                     # if key entered is "z", undo moves
                     gs.undo()
                     moveMade = True
         if moveMade:
-            validMoves = gs.getAllPossibleMoves()
+            validMoves = gs.getValidMoves()
             moveMade = False
 
         drawGameState(screen, gs)  # draw the board
