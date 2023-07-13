@@ -54,7 +54,7 @@ class GameState:
             # piece moved was white king
             self.blackKingLocation = (move.endRow, move.endCol)
 
-    def undo(self):
+    def undoMove(self):
         # undo last move
 
         if len(self.moveLog):  # checks if move log isn't empty
@@ -72,7 +72,48 @@ class GameState:
 
     def getValidMoves(self):
         # all moves considering checks, i.e.to check if the piece movement gets king a check.
-        return self.getAllPossibleMoves()
+        """
+        Naive Methods for checking king checks:
+        -generate all possible moves
+        -for each move, make a move
+        -generate all possible opponent move
+        -for each move, check if any opponent move attack the king
+        -if they do attack the king, it's not a valid move
+        """
+
+        moves = self.getAllPossibleMoves()
+
+        for i in range(len(moves) - 1, -1, -1):  # when removing items from list, go backwards for potential bugs
+            self.makeMove(moves[i])
+            oppoMoves = self.getAllPossibleMoves()
+
+            self.whiteToMove = not self.whiteToMove
+            if self.inCheck():
+                moves.remove(moves[i])
+            self.whiteToMove = not self.whiteToMove
+            self.undoMove()
+        return moves
+
+    def inCheck(self):
+        # checks if current player is in check
+
+        if self.whiteToMove:
+            return self.isUnderAttack(self.whiteKingLocation[0], self.whiteKingLocation[1])
+        else:
+            return self.isUnderAttack(self.blackKingLocation[0], self.blackKingLocation[1])
+
+    def isUnderAttack(self, r, c):
+        # determines if enemy can attack the square
+
+        self.whiteToMove = not self.whiteToMove  # switch to opponent's POV
+        oppMoves = self.getAllPossibleMoves()
+        self.whiteToMove = not self.whiteToMove
+
+        for move in oppMoves:
+            # checks if any move attacks cell (r,c)
+            if move.endRow == r and move.endCol == c:
+                return True
+        return False
 
     def getAllPossibleMoves(self):
         # Get piece's all possible moves
