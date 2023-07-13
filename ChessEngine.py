@@ -21,7 +21,6 @@ class GameState:
         # Create an empty chess board
         self.board = np.empty((8, 8), dtype=object)
         self.board.fill('--')
-
         # Place the chess pieces on the board
         self.board[0] = ['bR', 'bN', 'bB', 'bQ', 'bK', 'bB', 'bN', 'bR']  # Black back row
         self.board[1] = ['bp'] * 8  # Black pawns
