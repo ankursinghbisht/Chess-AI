@@ -4,7 +4,6 @@ Responsible for handling user input and displaying current gamestate
 """
 
 import pygame as p
-import time
 import ChessEngine
 
 p.init()
@@ -82,34 +81,9 @@ def main():
             validMoves = gs.getValidMoves()
             moveMade = False
 
-        if gs.staleMate or gs.checkMate:
-            restartGame(screen)
-            gs = ChessEngine.GameState()
-            gs.staleMate = False
-            gs.checkMate = False
-
         drawGameState(screen, gs)  # draw the board
         clock.tick(MAX_FPS)
         p.display.flip()
-
-
-# Restarts the game after a 10-second delay
-def restartGame(screen):
-    print("Restarting the game...")
-    time.sleep(2)  # Delay for 10 seconds
-    message = "Game Restarting..."
-    font = p.font.Font(None, 36)
-    text = font.render(message, True, p.Color("black"))
-    text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
-
-    screen.fill(p.Color("white"))
-    screen.blit(text, text_rect)
-    p.display.flip()
-
-    time.sleep(2)  # Delay for 10 seconds
-    # Perform any necessary game reset or initialization here
-
-    print("Game restarted.")
 
 
 def drawGameState(screen, gs):
