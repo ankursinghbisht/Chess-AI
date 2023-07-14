@@ -81,6 +81,54 @@ class GameState:
 
         self.inCheck, self.pins, self.checks = self.checkForPinsAndChecks()
 
+        # setting up  king's location to evaluate moves
+        if self.whiteToMove:
+            kingRow = self.whiteKingLocation[0]
+            kingCol = self.whiteKingLocation[1]
+        else:
+            kingRow = self.blackKingLocation[0]
+            kingCol = self.blackKingLocation[1]
+
+        if self.inCheck:
+            # if king is in check
+            if len(self.checks) == 1:  # only 1 piece is giving the checks,i.e. block check or move king
+                moves = self.getAllPossibleMoves()
+
+                # to block check, piece must be moved between king and attacking piece
+                check = self.checks[0]
+                checkRow = check[0]
+                checkCol = check[1]
+                pieceChecking = self.board[checkRow, checkCol]  # finding piece checking the king
+                validSquares = []
+
+                # if knight gives a check, capture the knight or move the king, rest pieces' checks can be blocked
+                if pieceChecking[1] == "N":
+                    validSquares = [{checkRow, checkCol}]
+                else:
+                    for i in range(1, 8):
+                        validSquare = (kingRow + check[2] * i, kingCol + check[3] * i)
+                        # direction of attacking piece to block check
+                        validSquares.append(validSquare)
+                        if validSquare[0] == checkRow and validSquare[1] == checkCol:
+                            # once you get to piece & checks
+                            break
+
+                # get rid of all moves that don't move king or block check
+                for i in range(len(moves) - 1, -1, -1):  # going backwards while deleting from list
+                    if moves[i].pieceMoved[1] != 'K':
+                        # if piece moved wasn't king, check must be blocked, or piece must be captured
+                        if not (moves[i].endRow, moves[i].endCol) in validSquares:
+                            # if move doesn't stop check, remove it from list
+                            moves.remove(moves[i])
+
+
+            else:
+                # double check, king has to move
+                self.getKingMoves(kingRow, kingCol, moves)
+        else:
+            # if king isn't in check, then all moves are valid
+            moves = self.getAllPossibleMoves()
+
     def getAllPossibleMoves(self):
         # Get piece's all possible moves
         moves = [Move([6, 4], [4, 4], self.board)]  # stores all possible moves
