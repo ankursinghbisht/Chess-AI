@@ -383,7 +383,7 @@ class GameState:
                         # 4.Any direction and piece is queen
                         # 5. Any direction 1 square away and piece is a king
                         # (to prevent king movement in square controlled by another king)
-                        if ((0 <= j <= 3) and endPiece == 'R') or (4 <= j <= 7 and typeOfPiece == 'B') or (
+                        if ((0 <= j <= 3) and typeOfPiece == 'R') or (4 <= j <= 7 and typeOfPiece == 'B') or (
                                 i == 1 and typeOfPiece == 'p' and ((enemyColor == 'w' and 6 <= j <= 7) or (
                                 enemyColor == 'b' and 4 <= j <= 5))) or typeOfPiece == 'Q' or (i == 1 and typeOfPiece == "K"):
                             if possiblePins == ():
