@@ -64,13 +64,15 @@ def main():
                     # once 2 clicks are made to move the piece, move the piece
                     move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
 
-                    if move in validMoves:  # if move is valid, make a move
-                        print(move.getChessNotation())  # print notation
-                        gs.makeMove(move)
-                        moveMade = True
-                        sqSelected = ()
-                        playerClicks = []  # empty both variables for next use
-                    else:
+                    for i in range(len(validMoves)):
+                        if move == validMoves[i]:  # if move is valid, make a move
+                            print(move.getChessNotation())  # print notation
+                            gs.makeMove(validMoves[i])
+                            moveMade = True
+                            sqSelected = ()
+                            playerClicks = []  # empty both variables for next use
+                            break
+                    if not moveMade:
                         playerClicks = [sqSelected]
             elif e.type == p.KEYDOWN:
                 if e.key == p.K_z:

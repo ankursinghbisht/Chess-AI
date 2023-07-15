@@ -58,6 +58,10 @@ class GameState:
             # piece moved was white king
             self.blackKingLocation = (move.endRow, move.endCol)
 
+        # pawn promotion
+        if move.isPawnPromotion:
+            self.board[move.endRow, move.endCol] = move.pieceMoved[0] + 'Q'
+
     def undoMove(self):
         # undo last move
 
@@ -385,7 +389,8 @@ class GameState:
                         # (to prevent king movement in square controlled by another king)
                         if ((0 <= j <= 3) and typeOfPiece == 'R') or (4 <= j <= 7 and typeOfPiece == 'B') or (
                                 i == 1 and typeOfPiece == 'p' and ((enemyColor == 'w' and 6 <= j <= 7) or (
-                                enemyColor == 'b' and 4 <= j <= 5))) or typeOfPiece == 'Q' or (i == 1 and typeOfPiece == "K"):
+                                enemyColor == 'b' and 4 <= j <= 5))) or typeOfPiece == 'Q' or (
+                                i == 1 and typeOfPiece == "K"):
                             if possiblePins == ():
                                 # no piece to prevent the check
                                 inCheck = True
@@ -441,6 +446,11 @@ class Move:
         # storing piece moved and piece captured(if any), for undoing if needed
         self.pieceMoved = board[self.startRow, self.startCol]
         self.pieceCaptured = board[self.endRow, self.endCol]
+
+        # information about pawn promotion
+        self.isPawnPromotion = False
+        if (self.pieceMoved == 'wp' and self.endRow == 0) or (self.pieceMoved == 'bp' and self.endRow == 7):
+            self.isPawnPromotion = True
 
     def __eq__(self, other):
         # defining comparison operator for moves comparison
