@@ -36,7 +36,7 @@ def main():
     gs = ChessEngine.GameState()
     validMoves = gs.getValidMoves()  # gets valid move for current state
     moveMade = False  # flag variable to check if move is made for update of valid moves
-
+    animate = False  # flag variable to check when to animate piece movement
     loadImages()
     sqSelected = ()  # stores  last click of user as tuple (x,y)
     playerClicks = []  # keeps track of player clicks ( 2 Tuples : ex, (6,4)->(4,4))
@@ -71,6 +71,7 @@ def main():
                             print(move.getChessNotation())  # print notation
                             gs.makeMove(validMoves[i])
                             moveMade = True
+                            animate=True
                             sqSelected = ()
                             playerClicks = []  # empty both variables for next use
                             break
@@ -80,9 +81,12 @@ def main():
                 if e.key == p.K_z:
                     # if key entered is "z", undo moves
                     gs.undoMove()
+                    animate=False
                     moveMade = True
+
         if moveMade:
-            animateMove(gs.moveLog[-1], screen, gs.board, clock)
+            if animate:
+                animateMove(gs.moveLog[-1], screen, gs.board, clock)
             validMoves = gs.getValidMoves()
             moveMade = False
 
@@ -146,8 +150,7 @@ def animateMove(move, screen, board, clock):
     global colors
     distanceRow = move.endRow - move.startRow
     distanceCol = move.endCol - move.startCol
-    framesPerSquare = 10  # frames required to move piece by one square
-    frameCount = framesPerSquare * (abs(distanceRow) + abs(distanceCol))  # frames per square
+    frameCount = 10  # frames per square
 
     for frame in range(frameCount + 1):
         r, c = (move.startRow + distanceRow * frame / frameCount, move.startCol + distanceCol * frame / frameCount)
@@ -155,7 +158,7 @@ def animateMove(move, screen, board, clock):
         drawPieces(screen, board)
 
         # erase piece from ending square, which is being moved, as it is already moved in makeMove function
-        color = colors[(move.endRow+move.endCol) % 2]
+        color = colors[(move.endRow + move.endCol) % 2]
         endSquare = p.Rect(move.endCol * SQ_SIZE, move.endRow * SQ_SIZE, SQ_SIZE, SQ_SIZE)
         p.draw.rect(screen, color, endSquare)
 
