@@ -71,7 +71,7 @@ def main():
                             print(move.getChessNotation())  # print notation
                             gs.makeMove(validMoves[i])
                             moveMade = True
-                            animate=True
+                            animate = True
                             sqSelected = ()
                             playerClicks = []  # empty both variables for next use
                             break
@@ -81,9 +81,17 @@ def main():
                 if e.key == p.K_z:
                     # if key entered is "z", undo moves
                     gs.undoMove()
-                    animate=False
+                    animate = False
                     moveMade = True
 
+                if e.key == p.K_r:
+                    # if key entered is "r", undo moves
+                    gs = ChessEngine.GameState()
+                    validMoves = gs.getValidMoves()
+                    sqSelected = ()
+                    playerClicks = []
+                    moveMade = False
+                    animate = False
         if moveMade:
             if animate:
                 animateMove(gs.moveLog[-1], screen, gs.board, clock)
