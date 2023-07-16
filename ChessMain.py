@@ -57,7 +57,7 @@ def main():
                     playerClicks = []
 
                 elif gs.board[row, col] != '--' or len(playerClicks) == 1:
-                    # not allowing user to selected empty square
+                    # not allowing user to select empty square
                     sqSelected = (row, col)
                     playerClicks.append(sqSelected)
                 if len(playerClicks) == 2:
@@ -83,7 +83,7 @@ def main():
             validMoves = gs.getValidMoves()
             moveMade = False
 
-        drawGameState(screen, gs,validMoves,sqSelected)  # draw the board
+        drawGameState(screen, gs, validMoves, sqSelected)  # draw the board
         clock.tick(MAX_FPS)
         p.display.flip()
 
@@ -97,13 +97,13 @@ def highlightSquares(screen, gs, validMoves, sqSelected):
             # highlight the selected square
             surface = p.Surface((SQ_SIZE, SQ_SIZE))  # setting up the surface
             surface.set_alpha(150)  # setting transparency ,0 = transparent, 255=opaque
-            surface.fill((0, 100, 0))
+            surface.fill((0, 0, 128))
             screen.blit(surface, (column * SQ_SIZE, row * SQ_SIZE))
 
             # highlight potential moves
-            surface.fill((255, 253, 208))
+            surface.fill((135, 206, 250))
             for move in validMoves:
-                if move.startRow == row and move.endCol == column:
+                if move.startRow == row and move.startCol == column:
                     # all potential moves of selected piece
                     screen.blit(surface, (move.endCol * SQ_SIZE, move.endRow * SQ_SIZE))
 
