@@ -187,7 +187,7 @@ class GameState:
 
                 # if knight gives a check, capture the knight or move the king, rest pieces' checks can be blocked
                 if pieceChecking[1] == "N":
-                    validSquares = [{checkRow, checkCol}]
+                    validSquares = [(checkRow, checkCol)]
                 else:
                     for i in range(1, 8):
                         validSquare = (kingRow + check[2] * i, kingCol + check[3] * i)
