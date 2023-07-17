@@ -179,8 +179,6 @@ class GameState:
             # if king is in check
             if len(self.checks) == 1:  # only 1 piece is giving the checks,i.e. block check or move king
                 moves = self.getAllPossibleMoves()
-                if len(moves) == 0:
-                    self.checkMate = True
                 # to block check, piece must be moved between king and attacking piece
                 check = self.checks[0]
                 checkRow = check[0]
@@ -214,8 +212,15 @@ class GameState:
         else:
             # if king isn't in check, then all moves are valid
             moves = self.getAllPossibleMoves()
-            if len(moves) == 0:
+        if len(moves) == 0:
+            if self.inCheck:
+                self.checkMate=True
+            else:
                 self.staleMate = True
+        else:
+            self.checkMate=False
+            self.staleMate=False
+
         return moves
 
     def getAllPossibleMoves(self):

@@ -2,6 +2,7 @@
 main driver file.
 Responsible for handling user input and displaying current gamestate
 """
+import time
 
 import pygame as p
 import ChessEngine
@@ -43,21 +44,29 @@ def main():
     playerClicks = []  # keeps track of player clicks ( 2 Tuples : ex, (6,4)->(4,4))
 
     # if a human is playing white,it'll be true, else if bot is playing, it'll be false
-    playerOne = False
+    playerOne = True
     playerTwo = False
 
     running = True
     while running:
         humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
 
-        if gs.checkMate or gs.staleMate:
+        if gs.checkMate:  # restart the game, once check mate or stalemate
             gameOver = True
+            if gs.whiteToMove:
+                drawText(screen, "Black Win by CheckMate")
+            else:
+                drawText(screen, "Black Win by CheckMate")
+        elif gs.staleMate:
+            gameOver = True
+            drawText(screen, "StaleMate")
+
         for e in p.event.get():
             if e.type == p.QUIT:  # exits the game
                 running = False
                 break
             elif e.type == p.MOUSEBUTTONDOWN:
-                if humanTurn and not gameOver:
+                if humanTurn:
                     location = p.mouse.get_pos()  # x, y coordinate of mouse click
                     col = location[0] // SQ_SIZE
                     row = location[1] // SQ_SIZE
@@ -103,6 +112,14 @@ def main():
                     moveMade = False
                     animate = False
 
+        if gameOver:  # if game is over, restart
+            time.sleep(2)
+            gs = ChessEngine.GameState()
+            validMoves = gs.getValidMoves()
+            sqSelected = ()
+            playerClicks = []
+            moveMade = False
+            animate = False
         # AI move finder
         if not humanTurn:
             AIMove = BestMoveFinder.GreedyMove(gs, validMoves)
@@ -121,15 +138,6 @@ def main():
         drawGameState(screen, gs, validMoves, sqSelected)  # draw the board
         clock.tick(MAX_FPS)
         p.display.flip()
-
-        if gs.checkMate or gs.staleMate or gameOver:
-            gameOver = False
-            gs = ChessEngine.GameState()
-            validMoves = gs.getValidMoves()
-            sqSelected = ()
-            playerClicks = []
-            moveMade = False
-            animate = False
 
 
 def highlightSquares(screen, gs, validMoves, sqSelected):
@@ -208,6 +216,17 @@ def animateMove(move, screen, board, clock):
             screen.blit(IMAGES[move.pieceMoved], p.Rect(c * SQ_SIZE, r * SQ_SIZE, SQ_SIZE, SQ_SIZE))
         p.display.flip()
         clock.tick(60)
+
+
+def drawText(screen, text):
+    font = p.font.Font(None, 36)
+    textObject = font.render(text, False, p.Color('Gray'))
+    textLocation = p.Rect(0, 0, WIDTH, HEIGHT).move(WIDTH / 2 - textObject.get_width() / 2,
+                                                    HEIGHT / 2 - textObject.get_height() / 2)
+    screen.blit(textObject, textLocation)
+    textObject = font.render(text, False, p.Color("Black"))
+    screen.blit(textObject, textLocation)
+    p.display.flip()
 
 
 if __name__ == "__main__":
