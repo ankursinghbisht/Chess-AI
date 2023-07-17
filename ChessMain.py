@@ -17,7 +17,7 @@ MAX_FPS = 30
 # initialize global directory of images .This will be called exactly once in the main
 IMAGES = {}
 
-colors = [p.Color("white"), p.Color("grey")]
+colors = [(240, 217, 181), (181, 136, 99)] #light , dark squares
 
 
 def loadImages():
@@ -56,7 +56,7 @@ def main():
             if gs.whiteToMove:
                 drawText(screen, "Black Win by CheckMate")
             else:
-                drawText(screen, "Black Win by CheckMate")
+                drawText(screen, "White Win by CheckMate")
         elif gs.staleMate:
             gameOver = True
             drawText(screen, "StaleMate")
@@ -113,13 +113,14 @@ def main():
                     animate = False
 
         if gameOver:  # if game is over, restart
-            time.sleep(2)
+            time.sleep(5)
             gs = ChessEngine.GameState()
             validMoves = gs.getValidMoves()
             sqSelected = ()
             playerClicks = []
             moveMade = False
             animate = False
+            gameOver = False
         # AI move finder
         if not humanTurn:
             AIMove = BestMoveFinder.GreedyMove(gs, validMoves)
@@ -150,11 +151,11 @@ def highlightSquares(screen, gs, validMoves, sqSelected):
             # highlight the selected square
             surface = p.Surface((SQ_SIZE, SQ_SIZE))  # setting up the surface
             surface.set_alpha(150)  # setting transparency ,0 = transparent, 255=opaque
-            surface.fill((0, 0, 128))
+            surface.fill((106, 155, 65))
             screen.blit(surface, (column * SQ_SIZE, row * SQ_SIZE))
 
             # highlight potential moves
-            surface.fill((135, 206, 250))
+            surface.fill((250, 250, 122))
             for move in validMoves:
                 if move.startRow == row and move.startCol == column:
                     # all potential moves of selected piece
