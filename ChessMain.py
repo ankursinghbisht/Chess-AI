@@ -28,7 +28,6 @@ def loadImages():
 
 def main():
     # main driver function , handles inputs and graphics update
-
     screen = p.display.set_mode((WIDTH, HEIGHT))  # set up the screen
     p.display.set_caption("Chess")
     clock = p.time.Clock()
@@ -38,24 +37,27 @@ def main():
     validMoves = gs.getValidMoves()  # gets valid move for current state
     moveMade = False  # flag variable to check if move is made for update of valid moves
     animate = False  # flag variable to check when to animate piece movement
+    gameOver = False  # keeps track of game state, if game is over or not
     loadImages()
     sqSelected = ()  # stores  last click of user as tuple (x,y)
     playerClicks = []  # keeps track of player clicks ( 2 Tuples : ex, (6,4)->(4,4))
 
     # if a human is playing white,it'll be true, else if bot is playing, it'll be false
-    playerOne = True
+    playerOne = False
     playerTwo = False
 
     running = True
     while running:
         humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
 
+        if gs.checkMate or gs.staleMate:
+            gameOver = True
         for e in p.event.get():
             if e.type == p.QUIT:  # exits the game
                 running = False
                 break
             elif e.type == p.MOUSEBUTTONDOWN:
-                if humanTurn:
+                if humanTurn and not gameOver:
                     location = p.mouse.get_pos()  # x, y coordinate of mouse click
                     col = location[0] // SQ_SIZE
                     row = location[1] // SQ_SIZE
@@ -103,7 +105,9 @@ def main():
 
         # AI move finder
         if not humanTurn:
-            AIMove = BestMoveFinder.findRandomMove(validMoves)
+            AIMove = BestMoveFinder.GreedyMove(gs, validMoves)
+            if AIMove is None:
+                AIMove = BestMoveFinder.findRandomMove(validMoves)
             gs.makeMove(AIMove)
             moveMade = True
             animate = True
@@ -117,6 +121,15 @@ def main():
         drawGameState(screen, gs, validMoves, sqSelected)  # draw the board
         clock.tick(MAX_FPS)
         p.display.flip()
+
+        if gs.checkMate or gs.staleMate or gameOver:
+            gameOver = False
+            gs = ChessEngine.GameState()
+            validMoves = gs.getValidMoves()
+            sqSelected = ()
+            playerClicks = []
+            moveMade = False
+            animate = False
 
 
 def highlightSquares(screen, gs, validMoves, sqSelected):
@@ -191,7 +204,8 @@ def animateMove(move, screen, board, clock):
             screen.blit(IMAGES[move.pieceCaptured], endSquare)
 
         # draw moving piece
-        screen.blit(IMAGES[move.pieceMoved], p.Rect(c * SQ_SIZE, r * SQ_SIZE, SQ_SIZE, SQ_SIZE))
+        if move.pieceMoved in IMAGES:
+            screen.blit(IMAGES[move.pieceMoved], p.Rect(c * SQ_SIZE, r * SQ_SIZE, SQ_SIZE, SQ_SIZE))
         p.display.flip()
         clock.tick(60)
 
