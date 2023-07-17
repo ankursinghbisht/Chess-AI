@@ -42,6 +42,8 @@ class GameState:
         self.inCheck = False
         self.pins = []  # pinned pieces to the king
         self.checks = []  # enemy square that gave the check
+        self.checkMate = False
+        self.staleMate = False
 
         self.enpassantPossible = ()  # coordinates of square, where enpassant is possible
 
@@ -63,7 +65,7 @@ class GameState:
             # piece moved was white king
             self.whiteKingLocation = (move.endRow, move.endCol)
         elif move.pieceMoved == 'bK':
-            # piece moved was white king
+            # piece moved was black king
             self.blackKingLocation = (move.endRow, move.endCol)
 
         # pawn promotion
@@ -177,7 +179,8 @@ class GameState:
             # if king is in check
             if len(self.checks) == 1:  # only 1 piece is giving the checks,i.e. block check or move king
                 moves = self.getAllPossibleMoves()
-
+                if len(moves) == 0:
+                    self.checkMate = True
                 # to block check, piece must be moved between king and attacking piece
                 check = self.checks[0]
                 checkRow = check[0]
@@ -211,12 +214,13 @@ class GameState:
         else:
             # if king isn't in check, then all moves are valid
             moves = self.getAllPossibleMoves()
-
+            if len(moves) == 0:
+                self.staleMate = True
         return moves
 
     def getAllPossibleMoves(self):
         # Get piece's all possible moves
-        moves = [Move([6, 4], [4, 4], self.board)]  # stores all possible moves
+        moves = []  # stores all possible moves
         for r in range(DIMENSION):
             for c in range(DIMENSION):
                 turn = self.board[r, c][0]  # gets first character of the pieces ( eg, bR -> b, wK -> w)
@@ -294,7 +298,6 @@ class GameState:
                     # we use 2 function for finding valid moves for queen
                     # can't pin queen from pin on rook moves,only remove it on bishop moves
                     self.pins.remove(self.pins[i])
-                self.pins.remove(self.pins[i])
                 break
 
         directions = ((-1, 0), (0, -1), (1, 0), (0, 1))  # possible directions of rook move (up,left, down, right)
