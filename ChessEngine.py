@@ -123,11 +123,10 @@ class GameState:
             if move.pieceMoved[1] == 'p' and abs(move.startRow - move.endRow) == 2:
                 self.enpassantPossible = ()
 
-            if move.pieceMoved[1] == 'K' and abs(move.endCol - move.startCol) > 1:
-                # undoing castle rights
-                self.castleRightLog.pop()  # removing last castle rights
-                self.currentCastlingRight = self.castleRightLog[-1]
-                # updating caste rights to the last castle rights before move
+            # undo castle rights
+            self.castleRightLog.pop()  # removing last castle rights
+            self.currentCastlingRight = self.castleRightLog[-1]
+            # updating caste rights to the last castle rights before move
 
             # undo castle move
             if move.isCastleMove:
@@ -138,6 +137,9 @@ class GameState:
                 else:  # queen side castle
                     self.board[move.endRow, move.endCol - 2] = self.board[move.endRow, move.endCol + 1]
                     self.board[move.endRow, move.endCol + 1] = '--'
+
+            self.checkMate = False
+            self.staleMate = False
 
     def updateCastleRights(self, move):
         if move.pieceMoved == 'wK':  # check if king was moved to remove all castling rights
@@ -156,9 +158,9 @@ class GameState:
         elif move.pieceMoved == 'bR':
             if move.startRow == 0:
                 if move.endRow == 0:  # left rook
-                    self.currentCastlingRight.wqs = False
+                    self.currentCastlingRight.bqs = False
                 if move.endRow == 7:  # right rook
-                    self.currentCastlingRight.wks = False
+                    self.currentCastlingRight.bks = False
 
     def getValidMoves(self):
         # all moves considering checks, i.e.to check if the piece movement gets king a check.
@@ -214,12 +216,12 @@ class GameState:
             moves = self.getAllPossibleMoves()
         if len(moves) == 0:
             if self.inCheck:
-                self.checkMate=True
+                self.checkMate = True
             else:
                 self.staleMate = True
         else:
-            self.checkMate=False
-            self.staleMate=False
+            self.checkMate = False
+            self.staleMate = False
 
         return moves
 

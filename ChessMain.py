@@ -17,7 +17,7 @@ MAX_FPS = 30
 # initialize global directory of images .This will be called exactly once in the main
 IMAGES = {}
 
-colors = [(240, 217, 181), (181, 136, 99)] #light , dark squares
+colors = [(240, 217, 181), (181, 136, 99)]  # light , dark squares
 
 
 def loadImages():
@@ -113,7 +113,7 @@ def main():
                     animate = False
 
         if gameOver:  # if game is over, restart
-            time.sleep(5)
+            time.sleep(2)
             gs = ChessEngine.GameState()
             validMoves = gs.getValidMoves()
             sqSelected = ()

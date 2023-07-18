@@ -18,18 +18,23 @@ def GreedyMove(gs, validMoves):
         gs.makeMove(playerMove)
 
         opponentMoves = gs.getValidMoves()
-        opponentMaxScore = -CHECKMATE
-        for opponentMove in opponentMoves:
-            gs.makeMove(opponentMove)
-            if gs.checkMate:
-                score = -CHECKMATE * turnMultiplier
-            elif gs.staleMate:
-                score = STALEMATE
-            else:
-                score = -turnMultiplier * scoreMaterial(gs.board)
-            if score > opponentMaxScore:
-                opponentMaxScore = score
-            gs.undoMove()
+        if gs.staleMate:
+            opponentMaxScore = STALEMATE
+        elif gs.checkMate:
+            opponentMaxScore = -CHECKMATE
+        else:
+            opponentMaxScore = -CHECKMATE
+            for opponentMove in opponentMoves:
+                gs.makeMove(opponentMove)
+                if gs.checkMate:
+                    score = CHECKMATE
+                elif gs.staleMate:
+                    score = STALEMATE
+                else:
+                    score = -turnMultiplier * scoreMaterial(gs.board)
+                if score > opponentMaxScore:
+                    opponentMaxScore = score
+                gs.undoMove()
 
         if opponentMinMaxScore > opponentMaxScore:
             opponentMinMaxScore = opponentMaxScore
