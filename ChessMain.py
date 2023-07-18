@@ -122,8 +122,9 @@ def main():
             animate = False
             gameOver = False
         # AI move finder
+
         if not humanTurn:
-            AIMove = BestMoveFinder.GreedyMove(gs, validMoves)
+            AIMove = BestMoveFinder.findBestMoveMinMax(gs, validMoves)
             if AIMove is None:
                 AIMove = BestMoveFinder.findRandomMove(validMoves)
             gs.makeMove(AIMove)

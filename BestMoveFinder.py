@@ -3,13 +3,58 @@ import random
 pieceScore = {"K": 0, "Q": 9, "R": 5, "N": 3, "B": 3, "p": 1}
 CHECKMATE = 1000
 STALEMATE = 0
+DEPTH = 3
+nextMove = None
+
+
+def findBestMove(gs, validMoves):
+    return findBestMoveMinMax(gs, validMoves)
+
+
+def findBestMoveMinMax(gs, validMoves):
+    # helper method to make first recursive call
+    global nextMove
+    findMoveMinMax(gs, validMoves, DEPTH, gs.whiteToMove)
+    return nextMove
+
+
+def findMoveMinMax(gs, validMoves, depth, whiteToMove):
+    global nextMove
+    if depth == 0:
+        return scoreBoard(gs)
+    if whiteToMove:
+        # white's turn, try to maximize the score
+        maxScore = -CHECKMATE
+        for move in validMoves:
+            gs.makeMove(move)
+            nextMoves = gs.getValidMoves()
+            score = findMoveMinMax(gs, nextMoves, depth - 1, False)
+            if score > maxScore:
+                maxScore = score
+                if depth == DEPTH:
+                    nextMove = move
+            gs.undoMove()
+        return maxScore
+    else:
+        # black's turn, try to minimize the score
+        minScore = CHECKMATE
+        for move in validMoves:
+            gs.makeMove(move)
+            nextMoves = gs.getValidMoves()
+            score = findMoveMinMax(gs, nextMoves, depth - 1, True)
+            if score < minScore:
+                minScore = score
+                if depth == DEPTH:
+                    nextMove = move
+            gs.undoMove()
+        return minScore
 
 
 def findRandomMove(validMoves):
     return validMoves[random.randint(0, len(validMoves) - 1)]
 
 
-def GreedyMove(gs, validMoves):
+def greedyMove(gs, validMoves):
     turnMultiplier = 1 if gs.whiteToMove else -1
     opponentMinMaxScore = CHECKMATE
     bestPlayerMove = None
@@ -31,7 +76,7 @@ def GreedyMove(gs, validMoves):
                 elif gs.staleMate:
                     score = STALEMATE
                 else:
-                    score = -turnMultiplier * scoreMaterial(gs.board)
+                    score = -turnMultiplier * scoreBoard(gs)
                 if score > opponentMaxScore:
                     opponentMaxScore = score
                 gs.undoMove()
@@ -44,13 +89,20 @@ def GreedyMove(gs, validMoves):
     return bestPlayerMove
 
 
-def findBestMove(validMoves):
-    return validMoves[random.randint(0, len(validMoves) - 1)]
+def scoreBoard(gs):
+    # function to check current state of board,  positive score is good for white and negative is good for black
 
+    if gs.checkMate:  # if one player is already checkmated, need not check the whole board
+        if gs.whiteToMove:
+            return -CHECKMATE  # black wins
+        else:
+            return CHECKMATE  # white wins
+    if gs.staleMate:
+        return STALEMATE
 
-def scoreMaterial(board):
     score = 0
-    for row in board:
+    for row in gs.board:
+        # iterating through each square of the board, adding value of piece if white, else subtract
         for square in row:
             if square[0] == 'w':
                 score += pieceScore[square[1]]
