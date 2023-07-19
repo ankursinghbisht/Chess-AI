@@ -3,25 +3,43 @@ import random
 pieceScore = {"K": 0, "Q": 9, "R": 5, "N": 3, "B": 3, "p": 1}
 CHECKMATE = 1000
 STALEMATE = 0
-DEPTH = 3
-nextMove = None
+DEPTH = 2
+nextMove = None  # set a global variable to store the best possible move in current game state
 
 
 def findBestMove(gs, validMoves):
-    return findBestMoveMinMax(gs, validMoves)
-
-
-def findBestMoveMinMax(gs, validMoves):
     # helper method to make first recursive call
     global nextMove
-    findMoveMinMax(gs, validMoves, DEPTH, gs.whiteToMove)
+    # findMoveMinMax(gs, validMoves, DEPTH, gs.whiteToMove)
+    findMoveNegaMax(gs, validMoves, DEPTH, 1 if gs.whiteToMove else 0)
     return nextMove
+
+
+def findMoveNegaMax(gs, validMoves, depth, turnMultiplier):
+    global nextMove
+    if depth == 0:
+        return turnMultiplier * scoreBoard(gs)
+    random.shuffle(validMoves)
+
+    maxScore = -CHECKMATE
+    for move in validMoves:
+        gs.makeMove(move)
+        nextMoves = gs.getValidMoves()
+        score = -findMoveNegaMax(gs, nextMoves, depth - 1, -turnMultiplier)
+        if score > maxScore:
+            maxScore = score
+            if depth == DEPTH:
+                nextMove = move
+
+        gs.undoMove()
+    return maxScore
 
 
 def findMoveMinMax(gs, validMoves, depth, whiteToMove):
     global nextMove
     if depth == 0:
         return scoreBoard(gs)
+    random.shuffle(validMoves)
     if whiteToMove:
         # white's turn, try to maximize the score
         maxScore = -CHECKMATE

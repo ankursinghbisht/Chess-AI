@@ -44,7 +44,7 @@ def main():
     playerClicks = []  # keeps track of player clicks ( 2 Tuples : ex, (6,4)->(4,4))
 
     # if a human is playing white,it'll be true, else if bot is playing, it'll be false
-    playerOne = True
+    playerOne = False
     playerTwo = False
 
     running = True
@@ -124,7 +124,7 @@ def main():
         # AI move finder
 
         if not humanTurn:
-            AIMove = BestMoveFinder.findBestMoveMinMax(gs, validMoves)
+            AIMove = BestMoveFinder.findBestMove(gs, validMoves)
             if AIMove is None:
                 AIMove = BestMoveFinder.findRandomMove(validMoves)
             gs.makeMove(AIMove)
