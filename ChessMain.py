@@ -44,8 +44,8 @@ def main():
     playerClicks = []  # keeps track of player clicks ( 2 Tuples : ex, (6,4)->(4,4))
 
     # if a human is playing white,it'll be true, else if bot is playing, it'll be false
-    playerOne = False
-    playerTwo = False
+    playerOne = True
+    playerTwo = True
 
     running = True
     while running:
@@ -211,6 +211,9 @@ def animateMove(move, screen, board, clock):
 
         # draw piece being captured into the square (if any)
         if move.pieceCaptured != '--':
+            if move.isEnpassantMove:
+                enPassantRow = move.endRow + 1 if move.pieceCaptured[0] == 'b' else move.endRow - 1
+                endSquare = p.Rect(move.endCol * SQ_SIZE, enPassantRow * SQ_SIZE, SQ_SIZE, SQ_SIZE)
             screen.blit(IMAGES[move.pieceCaptured], endSquare)
 
         # draw moving piece

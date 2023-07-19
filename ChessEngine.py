@@ -46,6 +46,7 @@ class GameState:
         self.staleMate = False
 
         self.enpassantPossible = ()  # coordinates of square, where enpassant is possible
+        self.enpassantLog = [self.enpassantPossible]
 
         # variable to store castling rights
         self.currentCastlingRight = CastleRights(True, True, True, True)
@@ -96,6 +97,7 @@ class GameState:
         self.castleRightLog.append(
             CastleRights(self.currentCastlingRight.wks, self.currentCastlingRight.wqs, self.currentCastlingRight.bks,
                          self.currentCastlingRight.bqs))
+        self.enpassantLog.append(self.enpassantPossible)
 
     def undoMove(self):
         # undo last move
@@ -117,12 +119,9 @@ class GameState:
                 # undo Enpassant
                 self.board[move.endRow, move.endCol] = '--'
                 self.board[move.startRow, move.endCol] = move.pieceCaptured
-                self.enpassantPossible = (move.endRow, move.endCol)
 
-            # undo 2 pawn move
-            if move.pieceMoved[1] == 'p' and abs(move.startRow - move.endRow) == 2:
-                self.enpassantPossible = ()
-
+            self.enpassantLog.pop()
+            self.enpassantPossible = self.enpassantLog[-1]
             # undo castle rights
             self.castleRightLog.pop()  # removing last castle rights
             self.currentCastlingRight = self.castleRightLog[-1]
@@ -161,6 +160,21 @@ class GameState:
                     self.currentCastlingRight.bqs = False
                 if move.endRow == 7:  # right rook
                     self.currentCastlingRight.bks = False
+
+        # if rook is captured
+        if move.pieceCaptured == 'wR':
+            if move.endRow == 7:
+                if move.endCol == 0:
+                    self.currentCastlingRight.wqs = False
+                elif move.endCol == 7:
+                    self.currentCastlingRight.wks = False
+
+        if move.pieceCaptured == 'bR':
+            if move.endRow == 0:
+                if move.endCol == 0:
+                    self.currentCastlingRight.wqs = False
+                elif move.endCol == 7:
+                    self.currentCastlingRight.wks = False
 
     def getValidMoves(self):
         # all moves considering checks, i.e.to check if the piece movement gets king a check.
