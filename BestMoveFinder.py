@@ -4,7 +4,7 @@ import numpy as np
 pieceScore = {"K": 0, "Q": 9, "R": 5, "N": 3, "B": 3, "p": 1}
 CHECKMATE = 1000
 STALEMATE = 0
-DEPTH = 4
+DEPTH = 3
 nextMove = None  # set a global variable to store the best possible move in current game state
 
 
@@ -12,7 +12,7 @@ def findBestMove(gs, validMoves):
     # helper method to make first recursive call
     global nextMove
     # findMoveMinMax(gs, validMoves, DEPTH, gs.whiteToMove)
-    findMoveNegaMax(gs, validMoves, DEPTH, -CHECKMATE, CHECKMATE, 1 if gs.whiteToMove else 0)
+    findMoveNegaMax(gs, validMoves, DEPTH, -CHECKMATE, CHECKMATE, 1 if gs.whiteToMove else -1)
     return nextMove
 
 
@@ -20,7 +20,7 @@ def findMoveNegaMax(gs, validMoves, depth, alpha, beta, turnMultiplier):
     # NegaMax with Alpha Beta Pruning
     global nextMove
     if depth == 0:
-        return turnMultiplier * scoreBoard(gs)
+        return turnMultiplier * evaluate_board(gs.board)
     random.shuffle(validMoves)
 
     maxScore = -CHECKMATE
@@ -209,6 +209,20 @@ def evaluate_board(board):
     pawn_structure_eval = 0
     piece_activity_eval = 0
 
+    white_pawn_files = set()
+    black_pawn_files = set()
+    white_passed_pawns = 0
+    black_passed_pawns = 0
+
+    white_king_pos = None
+    black_king_pos = None
+    white_pawn_shelter = 0
+    black_pawn_shelter = 0
+    white_pawn_cover = 0
+    black_pawn_cover = 0
+    white_castled = False
+    black_castled = False
+
     # Iterate over the board
     for row in range(8):
         for col in range(8):
@@ -228,15 +242,75 @@ def evaluate_board(board):
 
             # Evaluate pawn structure
             if piece == 'wp':
-                pawn_structure_eval += 10
+                # Check for doubled pawns
+                if col in white_pawn_files:
+                    pawn_structure_eval -= 5
+                else:
+                    white_pawn_files.add(col)
+
+                # Check for isolated pawns
+                if not (col - 1 in white_pawn_files or col + 1 in white_pawn_files):
+                    pawn_structure_eval -= 10
+
+                # Check for passed pawns
+                if not np.any(board[r][col - 1:col + 2] == '--' for r in range(row + 1, 8)):
+                    white_passed_pawns += 1
+
             elif piece == 'bp':
+                # Check for doubled pawns
+                if col in black_pawn_files:
+                    pawn_structure_eval += 5
+                else:
+                    black_pawn_files.add(col)
+
+                # Check for isolated pawns
+                if not (col - 1 in black_pawn_files or col + 1 in black_pawn_files):
+                    pawn_structure_eval += 10
+
+                # Check for passed pawns
+                if not np.any(board[r][col - 1:col + 2] == '--' for r in range(row - 1, -1, -1)):
+                    black_passed_pawns += 1
+            # Reward passed pawns and pawn majority
+            pawn_structure_eval += 5 * (white_passed_pawns - black_passed_pawns)
+            if len(white_pawn_files) > len(black_pawn_files):
+                pawn_structure_eval += 10
+            elif len(black_pawn_files) > len(white_pawn_files):
                 pawn_structure_eval -= 10
 
-            # Evaluate king safety
+            # Find king positions
             if piece == 'wK':
-                king_safety_eval += 5
+                white_king_pos = (row, col)
             elif piece == 'bK':
-                king_safety_eval -= 5
+                black_king_pos = (row, col)
+
+            # Evaluate pawn shelter and pawn cover
+            if row in [6, 7]:  # White pawn rows
+                if col in [5, 6]:  # Shelter squares: g2/h2 for White
+                    white_pawn_shelter += 5
+                if col in [4, 5, 6]:  # Cover squares: f2/g2/h2 for White
+                    white_pawn_cover += 2
+            elif row in [0, 1]:  # Black pawn rows
+                if col in [5, 6]:  # Shelter squares: g7/h7 for Black
+                    black_pawn_shelter += 5
+                if col in [4, 5, 6]:  # Cover squares: f7/g7/h7 for Black
+                    black_pawn_cover += 2
+
+            # Check if kings have castled
+            if white_king_pos:
+                if white_king_pos[1] == 4 and white_king_pos[0] == 7:
+                    white_castled = True
+            if black_king_pos:
+                if black_king_pos[1] == 4 and black_king_pos[0] == 0:
+                    black_castled = True
+
+            # Reward pawn shelter and pawn cover
+            king_safety_eval += white_pawn_shelter - black_pawn_shelter + white_pawn_cover - black_pawn_cover
+
+            # Penalize for not castling
+            if not white_castled:
+                king_safety_eval -= 10
+            if not black_castled:
+                king_safety_eval += 10
 
     # Combine the evaluation factors with appropriate weights
     evaluation = (

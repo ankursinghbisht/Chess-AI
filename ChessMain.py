@@ -205,10 +205,10 @@ def drawMoveLog(screen, gs, font):
     moveTexts = []
 
     for i in range(0, len(moveLog), 2):
-        moveString = str(i // 2 + 1) + " . " + moveLog[i].getChessNotation() + " - "
+        moveString = str(i // 2 + 1) + " . " + str(moveLog[i]) + " - "
         if i + 1 < len(moveLog):
             # making sure black made a move
-            moveString += moveLog[i + 1].getChessNotation()+" "
+            moveString += str(moveLog[i + 1])+" "
         moveTexts.append(moveString)
 
     movesPerRow = 2
