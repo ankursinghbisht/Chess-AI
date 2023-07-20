@@ -643,11 +643,34 @@ class Move:
         # castle move
         self.isCastleMove = isCastleMove
 
+        # is capture move
+        self.isCapture = self.pieceCaptured != '--'
+
     def __eq__(self, other):
         # defining comparison operator for moves comparison
         if isinstance(other, Move):
             return self.moveID == other.moveID
         return False
+
+    def __str__(self):
+        # overriding the str() function
+
+        # castle move
+        if self.isCastleMove:
+            return "O-O" if self.endCol == 6 else "O-O-O"
+        endSquare = self.getRankFile(self.endRow, self.endCol)
+
+        # pawn move
+        if self.pieceMoved[1] == 'p':
+            if self.isCapture:
+                return self.colsToFiles[self.startCol] + "x" + endSquare
+            else:
+                return endSquare
+
+        moveString = self.pieceMoved[1]
+        if self.isCapture:
+            moveString += 'x'
+        return moveString + endSquare
 
     def getChessNotation(self):
         # returns chess notation for particular move
