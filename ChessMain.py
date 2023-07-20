@@ -9,9 +9,11 @@ import ChessEngine
 import BestMoveFinder
 
 p.init()
-WIDTH = HEIGHT = 512  # size of our board
+BOARD_WIDTH = BOARD_HEIGHT = 512  # size of our board
+MOVE_LOG_PANEL_WIDTH = 256
+MOVE_LOG_PANEL_HEIGHT = BOARD_HEIGHT
 DIMENSION = 8  # Dimension of our chess board is 8x8
-SQ_SIZE = WIDTH // DIMENSION  # size of each square
+SQ_SIZE = BOARD_WIDTH // DIMENSION  # size of each square
 MAX_FPS = 30
 
 # initialize global directory of images .This will be called exactly once in the main
@@ -29,10 +31,11 @@ def loadImages():
 
 def main():
     # main driver function , handles inputs and graphics update
-    screen = p.display.set_mode((WIDTH, HEIGHT))  # set up the screen
+    screen = p.display.set_mode((BOARD_WIDTH + MOVE_LOG_PANEL_WIDTH, BOARD_HEIGHT))  # set up the screen
     p.display.set_caption("Chess")
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
+    moveLogFont = p.font.Font(None, 24)
 
     gs = ChessEngine.GameState()
     validMoves = gs.getValidMoves()  # gets valid move for current state
@@ -45,7 +48,7 @@ def main():
 
     # if a human is playing white,it'll be true, else if bot is playing, it'll be false
     playerOne = True
-    playerTwo = True
+    playerTwo = False
 
     running = True
     while running:
@@ -72,7 +75,7 @@ def main():
                     row = location[1] // SQ_SIZE
                     # determining which square user clicked
 
-                    if sqSelected == (row, col):
+                    if sqSelected == (row, col) or row >= 8 or col >= 8:
                         # user clicked on same square twice, i.e. it needed to be unselected
                         sqSelected = ()
                         playerClicks = []
@@ -137,7 +140,7 @@ def main():
             validMoves = gs.getValidMoves()
             moveMade = False
 
-        drawGameState(screen, gs, validMoves, sqSelected)  # draw the board
+        drawGameState(screen, gs, validMoves, sqSelected, moveLogFont)  # draw the board
         clock.tick(MAX_FPS)
         p.display.flip()
 
@@ -163,12 +166,13 @@ def highlightSquares(screen, gs, validMoves, sqSelected):
                     screen.blit(surface, (move.endCol * SQ_SIZE, move.endRow * SQ_SIZE))
 
 
-def drawGameState(screen, gs, validMoves, sqSelected):
+def drawGameState(screen, gs, validMoves, sqSelected, moveLogfont):
     # responsible for all  graphics with current game state
 
     drawBoard(screen)  # draw pieces on the screen
     highlightSquares(screen, gs, validMoves, sqSelected)
     drawPieces(screen, gs.board)
+    drawMoveLog(screen, gs, moveLogfont)
 
 
 def drawBoard(screen):
@@ -191,6 +195,23 @@ def drawPieces(screen, board):
             piece = board[r, c]
             if piece != '--':  # space is not empty
                 screen.blit(IMAGES[piece], p.Rect(c * SQ_SIZE, r * SQ_SIZE, SQ_SIZE, SQ_SIZE))
+
+
+def drawMoveLog(screen, gs, font):
+    # draws the move log
+    moveLogRect = p.Rect(BOARD_WIDTH, 0, MOVE_LOG_PANEL_WIDTH, MOVE_LOG_PANEL_HEIGHT)
+    p.draw.rect(screen, p.Color("black"), moveLogRect)
+    moveLog = gs.moveLog
+    padding = 5
+    linespacing=2
+    textY = padding
+    for i in range(len(moveLog)):
+        move = moveLog[i].getChessNotation()
+        textObject = font.render(move, True, p.Color('white'))
+        textLocation = moveLogRect.move(padding, textY)
+        screen.blit(textObject, textLocation)
+        textY += textObject.get_height()+linespacing
+    p.display.flip()
 
 
 def animateMove(move, screen, board, clock):
@@ -226,8 +247,8 @@ def animateMove(move, screen, board, clock):
 def drawText(screen, text):
     font = p.font.Font(None, 36)
     textObject = font.render(text, False, p.Color('Gray'))
-    textLocation = p.Rect(0, 0, WIDTH, HEIGHT).move(WIDTH / 2 - textObject.get_width() / 2,
-                                                    HEIGHT / 2 - textObject.get_height() / 2)
+    textLocation = p.Rect(0, 0, BOARD_WIDTH, BOARD_HEIGHT).move(BOARD_WIDTH / 2 - textObject.get_width() / 2,
+                                                                BOARD_HEIGHT / 2 - textObject.get_height() / 2)
     screen.blit(textObject, textLocation)
     textObject = font.render(text, False, p.Color("Black"))
     screen.blit(textObject, textLocation)
