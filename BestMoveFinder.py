@@ -20,7 +20,7 @@ def findMoveNegaMax(gs, validMoves, depth, alpha, beta, turnMultiplier):
     # NegaMax with Alpha Beta Pruning
     global nextMove
     if depth == 0:
-        return turnMultiplier * evaluate_board(gs.board, gs.whiteToMove)
+        return turnMultiplier * evaluate_board(gs.board)
     random.shuffle(validMoves)
 
     maxScore = -CHECKMATE
@@ -136,18 +136,18 @@ def scoreBoard(gs):
     return score
 
 
-def evaluate_board(board, white_to_move):
+def evaluate_board(board):
     # another way of evaluating board
     piece_values = {'p': 1, 'N': 3, 'B': 3, 'R': 5, 'Q': 9, 'K': 0}  # Piece values
     piece_squares = {
         'p': np.array([
-            [0, 0, 0, 0, 0, 0, 0, 0],
-            [50, 50, 50, 50, 50, 50, 50, 50],
-            [10, 10, 20, 30, 30, 20, 10, 10],
-            [5, 5, 10, 25, 25, 10, 5, 5],
-            [0, 0, 0, 20, 20, 0, 0, 0],
-            [5, -5, -10, 0, 0, -10, -5, 5],
-            [5, 5, 5, -20, -20, 10, 10, 5],
+            [8, 8, 8, 8, 8, 8, 8, 8],
+            [8, 8, 8, 8, 8, 8, 8, 8],
+            [5, 6, 6, 7, 7, 6, 6, 5],
+            [2, 2, 3, 5, 5, 3, 2, 2],
+            [1, 2, 3, 4, 4, 3, 2, 1],
+            [1, 2, 3, 3, 3, 3, 2, 1],
+            [1, 1, 1, 0, 0, 1, 1, 1],
             [0, 0, 0, 0, 0, 0, 0, 0]
         ]),
         'N': np.array([
@@ -172,34 +172,34 @@ def evaluate_board(board, white_to_move):
 
         ]),
         'R': np.array([
-            [0, 0, 0, 0, 0, 0, 0, 0],
-            [5, 10, 10, 10, 10, 10, 10, 5],
-            [-5, 0, 0, 0, 0, 0, 0, -5],
-            [-5, 0, 0, 0, 0, 0, 0, -5],
-            [-5, 0, 0, 0, 0, 0, 0, -5],
-            [-5, 0, 0, 0, 0, 0, 0, -5],
-            [-5, 0, 0, 0, 0, 0, 0, -5],
-            [0, 0, 0, 5, 5, 0, 0, 0]
+            [0, 2, 2, 2, 2, 2, 2, 0],
+            [3, 3, 3, 3, 3, 3, 3, 3],
+            [1, 1, 2, 2, 2, 2, 1, 1],
+            [1, 2, 2, 2, 2, 2, 2, 1],
+            [1, 2, 2, 2, 2, 2, 2, 1],
+            [1, 1, 2, 2, 2, 2, 1, 1],
+            [1, 1, 1, 3, 3, 1, 1, 1],
+            [0, 2, 3, 4, 4, 3, 2, 0],
         ]),
         'Q': np.array([
-            [-20, -10, -10, -5, -5, -10, -10, -20],
-            [-10, 0, 0, 0, 0, 0, 0, -10],
-            [-10, 0, 5, 5, 5, 5, 0, -10],
-            [-5, 0, 5, 5, 5, 5, 0, -5],
-            [0, 0, 5, 5, 5, 5, 0, -5],
-            [-10, 5, 5, 5, 5, 5, 0, -10],
-            [-10, 0, 5, 0, 0, 0, 0, -10],
-            [-20, -10, -10, -5, -5, -10, -10, -20]
+            [0, 1, 1, 3, 1, 1, 1, 0],
+            [1, 2, 3, 3, 3, 1, 1, 1],
+            [1, 4, 3, 3, 3, 4, 2, 1],
+            [1, 2, 3, 3, 3, 2, 2, 1],
+            [1, 2, 3, 3, 3, 2, 2, 1],
+            [1, 4, 3, 3, 3, 4, 2, 1],
+            [1, 2, 3, 3, 3, 1, 1, 1],
+            [0, 1, 1, 3, 1, 1, 1, 0]
         ]),
         'K': np.array([
-            [20, 30, 10, 0, 0, 10, 30, 20],
-            [20, 20, 0, 0, 0, 0, 20, 20],
-            [-10, -20, -20, -20, -20, -20, -20, -10],
-            [-20, -30, -30, -40, -40, -30, -30, -20],
-            [-30, -40, -40, -50, -50, -40, -40, -30],
-            [-30, -40, -40, -50, -50, -40, -40, -30],
-            [-30, -40, -40, -50, -50, -40, -40, -30],
-            [-30, -40, -40, -50, -50, -40, -40, -30]
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [1, 1, 1, 0, 0, 1, 1, 1],
+            [4, 6, 4, 1, 1, 4, 6, 4],
+            [6, 8, 6, 3, 3, 6, 8, 6],
         ])
     }
 
@@ -313,15 +313,13 @@ def evaluate_board(board, white_to_move):
             if not black_castled:
                 king_safety_eval += 10
 
-    sign_factor = 1 if white_to_move else -1
-
     # Combine the evaluation factors with appropriate weights and sign factor
     evaluation = (
-            sign_factor * 100 * material_eval +
-            sign_factor * 10 * mobility_eval +
-            sign_factor * 10 * king_safety_eval +
-            sign_factor * 5 * pawn_structure_eval +
-            sign_factor * 5 * piece_activity_eval
+            100 * material_eval +
+            10 * mobility_eval +
+            10 * king_safety_eval +
+            5 * pawn_structure_eval +
+            5 * piece_activity_eval
     )
 
     return evaluation
