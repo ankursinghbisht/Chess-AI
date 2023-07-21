@@ -122,10 +122,6 @@ class GameState:
 
             self.enpassantLog.pop()
             self.enpassantPossible = self.enpassantLog[-1]
-            # undo castle rights
-            self.castleRightLog.pop()  # removing last castle rights
-            self.currentCastlingRight = self.castleRightLog[-1]
-            # updating caste rights to the last castle rights before move
 
             # undo castle move
             if move.isCastleMove:
@@ -136,6 +132,11 @@ class GameState:
                 else:  # queen side castle
                     self.board[move.endRow, move.endCol - 2] = self.board[move.endRow, move.endCol + 1]
                     self.board[move.endRow, move.endCol + 1] = '--'
+
+            # undo castle rights
+            self.castleRightLog.pop()  # removing last castle rights
+            self.currentCastlingRight = self.castleRightLog[-1]
+            # updating caste rights to the last castle rights before move
 
             self.checkMate = False
             self.staleMate = False
@@ -180,6 +181,10 @@ class GameState:
         # all moves considering checks, i.e.to check if the piece movement gets king a check.
 
         moves = self.getAllPossibleMoves()
+
+        tempCastleRights = CastleRights(self.currentCastlingRight.wks, self.currentCastlingRight.wqs,
+                                        self.currentCastlingRight.bks,
+                                        self.currentCastlingRight.bqs)
 
         self.inCheck, self.pins, self.checks = self.checkForPinsAndChecks()
 
@@ -236,7 +241,7 @@ class GameState:
         else:
             self.checkMate = False
             self.staleMate = False
-
+        self.currentCastlingRight = tempCastleRights
         return moves
 
     def getAllPossibleMoves(self):
