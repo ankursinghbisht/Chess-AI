@@ -47,9 +47,10 @@ def main():
     playerClicks = []  # keeps track of player clicks ( 2 Tuples : ex, (6,4)->(4,4))
 
     # if a human is playing white,it'll be true, else if bot is playing, it'll be false
-    playerOne = True
+    playerOne = False
     playerTwo = False
 
+    drawGameState(screen, gs, validMoves, sqSelected, moveLogFont)
     running = True
     while running:
         humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
@@ -208,7 +209,7 @@ def drawMoveLog(screen, gs, font):
         moveString = str(i // 2 + 1) + " . " + str(moveLog[i]) + " - "
         if i + 1 < len(moveLog):
             # making sure black made a move
-            moveString += str(moveLog[i + 1])+" "
+            moveString += str(moveLog[i + 1]) + " "
         moveTexts.append(moveString)
 
     movesPerRow = 2
@@ -219,7 +220,7 @@ def drawMoveLog(screen, gs, font):
         text = ""
         for j in range(movesPerRow):
             if i + j < len(moveTexts):  # within bounds of moves text
-                text += moveTexts[i + j]+'  '
+                text += moveTexts[i + j] + '  '
         textObject = font.render(text, True, p.Color('white'))
         textLocation = moveLogRect.move(padding, textY)
         screen.blit(textObject, textLocation)

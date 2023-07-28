@@ -241,7 +241,7 @@ def evaluate_board(board):
             elif piece[0] == 'b':
                 piece_activity_eval -= piece_squares[piece[1]][7 - row][col]
 
-            # Evaluate pawn structure
+            """# Evaluate pawn structure
             if piece == 'wp':
                 # Check for doubled pawns
                 if col in white_pawn_files:
@@ -312,7 +312,7 @@ def evaluate_board(board):
                 king_safety_eval -= 10
             if not black_castled:
                 king_safety_eval += 10
-
+"""
     # Combine the evaluation factors with appropriate weights and sign factor
     evaluation = (
             100 * material_eval +
