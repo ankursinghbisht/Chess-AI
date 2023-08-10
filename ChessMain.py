@@ -7,6 +7,8 @@ import time
 import pygame as p
 import ChessEngine
 import BestMoveFinder
+import tkinter as tk
+from tkinter import messagebox
 
 p.init()
 BOARD_WIDTH = BOARD_HEIGHT = 512  # size of our board
@@ -15,6 +17,10 @@ MOVE_LOG_PANEL_HEIGHT = BOARD_HEIGHT
 DIMENSION = 8  # Dimension of our chess board is 8x8
 SQ_SIZE = BOARD_WIDTH // DIMENSION  # size of each square
 MAX_FPS = 30
+
+# if a human is playing white,it'll be true, else if bot is playing, it'll be false
+playerOne = True
+playerTwo = True
 
 # initialize global directory of images .This will be called exactly once in the main
 IMAGES = {}
@@ -27,6 +33,34 @@ def loadImages():
     for piece in pieces:
         IMAGES[piece] = p.transform.scale(p.image.load('images/' + piece + '.png'), (SQ_SIZE, SQ_SIZE))
         # images can be accessed by IMAGES['wK']
+
+
+def game_mode_menu():
+    # function to set values for game to decide which mode to play
+    def start_pvp():
+        root.destroy()
+        global playerOne, playerTwo
+        playerOne = True
+        playerTwo = True
+        main()
+
+    def start_vs_ai():
+        root.destroy()
+        global playerOne, playerTwo
+        playerOne = True
+        playerTwo = False
+        main()
+
+    root = tk.Tk()
+    root.title("Chess Game Mode")
+
+    pvp_button = tk.Button(root, text="Player vs Player", command=start_pvp)
+    pvp_button.pack(pady=10)
+
+    vs_ai_button = tk.Button(root, text="Player vs AI", command=start_vs_ai)
+    vs_ai_button.pack(pady=10)
+
+    root.mainloop()
 
 
 def main():
@@ -45,10 +79,6 @@ def main():
     loadImages()
     sqSelected = ()  # stores  last click of user as tuple (x,y)
     playerClicks = []  # keeps track of player clicks ( 2 Tuples : ex, (6,4)->(4,4))
-
-    # if a human is playing white,it'll be true, else if bot is playing, it'll be false
-    playerOne = False
-    playerTwo = False
 
     drawGameState(screen, gs, validMoves, sqSelected, moveLogFont)
     running = True
@@ -270,4 +300,4 @@ def drawText(screen, text):
 
 
 if __name__ == "__main__":
-    main()
+    game_mode_menu()
