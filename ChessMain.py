@@ -19,8 +19,8 @@ SQ_SIZE = BOARD_WIDTH // DIMENSION  # size of each square
 MAX_FPS = 30
 
 # if a human is playing white,it'll be true, else if bot is playing, it'll be false
-playerOne = True
-playerTwo = True
+playerOne = False
+playerTwo = False
 
 # initialize global directory of images .This will be called exactly once in the main
 IMAGES = {}
@@ -35,34 +35,6 @@ def loadImages():
         # images can be accessed by IMAGES['wK']
 
 
-def game_mode_menu():
-    # function to set values for game to decide which mode to play
-    def start_pvp():
-        root.destroy()
-        global playerOne, playerTwo
-        playerOne = True
-        playerTwo = True
-        main()
-
-    def start_vs_ai():
-        root.destroy()
-        global playerOne, playerTwo
-        playerOne = True
-        playerTwo = False
-        main()
-
-    root = tk.Tk()
-    root.title("Chess Game Mode")
-
-    pvp_button = tk.Button(root, text="Player vs Player", command=start_pvp)
-    pvp_button.pack(pady=10)
-
-    vs_ai_button = tk.Button(root, text="Player vs AI", command=start_vs_ai)
-    vs_ai_button.pack(pady=10)
-
-    root.mainloop()
-
-
 def main():
     # main driver function , handles inputs and graphics update
     screen = p.display.set_mode((BOARD_WIDTH + MOVE_LOG_PANEL_WIDTH, BOARD_HEIGHT))  # set up the screen
@@ -70,6 +42,9 @@ def main():
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
     moveLogFont = p.font.Font(None, 24)
+
+    global playerOne
+    global playerTwo
 
     gs = ChessEngine.GameState()
     validMoves = gs.getValidMoves()  # gets valid move for current state
@@ -79,6 +54,36 @@ def main():
     loadImages()
     sqSelected = ()  # stores  last click of user as tuple (x,y)
     playerClicks = []  # keeps track of player clicks ( 2 Tuples : ex, (6,4)->(4,4))
+
+    mode_selection = True
+    selected_mode = None
+
+    pvp_button_rect, ai_button_rect = drawModeSelection(screen)
+
+    while mode_selection:
+        for e in p.event.get():
+            if e.type == p.QUIT:
+                p.quit()
+                return
+            elif e.type == p.MOUSEBUTTONDOWN:
+                x, y = p.mouse.get_pos()
+                if pvp_button_rect.collidepoint(x, y):
+                    selected_mode = "PvP"
+                    mode_selection = False
+                elif ai_button_rect.collidepoint(x, y):
+                    selected_mode = "AI"
+                    mode_selection = False
+
+        drawModeSelection(screen)
+        p.display.flip()
+        clock.tick(MAX_FPS)
+
+    if selected_mode == "PvP":
+        playerOne = True
+        playerTwo = True
+    elif selected_mode == "AI":
+        playerOne = True
+        playerTwo = False
 
     drawGameState(screen, gs, validMoves, sqSelected, moveLogFont)
     running = True
@@ -197,13 +202,58 @@ def highlightSquares(screen, gs, validMoves, sqSelected):
                     screen.blit(surface, (move.endCol * SQ_SIZE, move.endRow * SQ_SIZE))
 
 
-def drawGameState(screen, gs, validMoves, sqSelected, moveLogfont):
-    # responsible for all  graphics with current game state
+def drawGameState(screen, gs, validMoves, sqSelected, moveLogFont):
+    # responsible for all graphics with current game state
 
-    drawBoard(screen)  # draw pieces on the screen
+    drawBoard(screen)
     highlightSquares(screen, gs, validMoves, sqSelected)
     drawPieces(screen, gs.board)
-    drawMoveLog(screen, gs, moveLogfont)
+    drawMoveLog(screen, gs, moveLogFont)
+
+
+def drawModeSelection(screen):
+    screen.fill(p.Color("black"))  # Clear the screen
+
+    title_font = p.font.Font(None, 48)
+    title_text = title_font.render("Chess Game", True, p.Color("white"))
+    title_rect = title_text.get_rect(center=(BOARD_WIDTH // 2, BOARD_HEIGHT // 4))
+    screen.blit(title_text, title_rect)
+
+    button_width = 200
+    button_height = 50
+    button_padding = 20
+    space_between_buttons = 20  # Adjust this value for the desired space
+
+    pvp_button_rect = p.Rect(
+        BOARD_WIDTH // 2 - button_width // 2,
+        BOARD_HEIGHT // 2 - button_height - space_between_buttons // 2 - button_padding,
+        button_width,
+        button_height
+    )
+
+    ai_button_rect = p.Rect(
+        BOARD_WIDTH // 2 - button_width // 2,
+        BOARD_HEIGHT // 2 + space_between_buttons // 2 + button_padding,
+        button_width,
+        button_height
+    )
+
+    p.draw.rect(screen, p.Color("white"), pvp_button_rect, border_radius=10)
+    p.draw.rect(screen, p.Color("white"), ai_button_rect, border_radius=10)
+
+    pvp_font = p.font.Font(None, 36)
+    ai_font = p.font.Font(None, 36)
+
+    pvp_text = pvp_font.render("Player vs Player", True, p.Color("black"))
+    ai_text = ai_font.render("Player vs AI", True, p.Color("black"))
+
+    pvp_text_rect = pvp_text.get_rect(center=pvp_button_rect.center)
+    ai_text_rect = ai_text.get_rect(center=ai_button_rect.center)
+
+    screen.blit(pvp_text, pvp_text_rect)
+    screen.blit(ai_text, ai_text_rect)
+
+    return pvp_button_rect, ai_button_rect
 
 
 def drawBoard(screen):
@@ -300,4 +350,4 @@ def drawText(screen, text):
 
 
 if __name__ == "__main__":
-    game_mode_menu()
+    main()
