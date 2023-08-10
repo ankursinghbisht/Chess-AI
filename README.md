@@ -1,7 +1,9 @@
 
 # Chess Engine
-
 Autonomous Chess Bot capable of playing the game independently.
+<img src="https://github.com/ankursinghbisht/Chess_Engine/assets/112644477/9ec0d375-1a55-4806-9b77-db1079a4a9f1" alt="image" width="600"/>
+
+
 ## Introduction
 
 
@@ -24,9 +26,15 @@ To get started with the Chess Game, follow these simple steps:
 - Execute 'ChessMain.py'.
 
 ## Screenshots
-Game Start Screen
-![image](https://github.com/ankursinghbisht/Chess_Engine/assets/112644477/d4bddd7b-f44b-4425-9cd2-e89db71bb4a0)
+### Game Start Screen
+<img src="https://github.com/ankursinghbisht/Chess_Engine/assets/112644477/d4bddd7b-f44b-4425-9cd2-e89db71bb4a0" alt="image" width="600"/>
 
+
+
+### Gameplay
+
+<img src="https://github.com/ankursinghbisht/Chess_Engine/assets/112644477/4a7c7f8f-9e82-46ba-85f8-ce794906e2bc" alt="image" width="600"/>
+<img src="https://github.com/ankursinghbisht/Chess_Engine/assets/112644477/b9f4bee4-f037-4389-bb2f-af69a45e34ef" alt="image" width="600"/>
 
 
 ## 🔗 Links
